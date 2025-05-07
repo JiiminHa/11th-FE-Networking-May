@@ -1,3 +1,11 @@
+---
+name: 💡 Feature
+about: 새로운 기능 개발 요청
+title: "[Feat] "
+labels: feat
+assignees: ""
+---
+
 ## 📌 기능 설명
 
 무엇을 개발할 것인지 명확하게 작성해주세요.
