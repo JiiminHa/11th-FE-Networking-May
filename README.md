@@ -36,9 +36,11 @@ chore: ESLint 설정 파일 추가
 
 #### 예시
 
-- feat/home-ui-1
-- fix/login-error-7
-- chore/eslint-setup-3
+```bash
+feat/home-ui-1
+fix/login-error-7
+chore/eslint-setup-3
+```
 
 ---
 
