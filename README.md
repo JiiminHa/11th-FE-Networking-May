@@ -1,54 +1,49 @@
-# React + TypeScript + Vite
+## Git 컨벤션
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+#### 커밋 type 예시
 
-Currently, two official plugins are available:
+| type     | 설명                                 |
+| -------- | ------------------------------------ |
+| feat     | 새로운 기능 추가                     |
+| fix      | 버그 수정                            |
+| refactor | 리팩토링 (기능 변화 없음)            |
+| style    | 코드 포맷팅 (세미콜론, 들여쓰기 등)  |
+| chore    | 설정, 패키지, 환경 구성 등 기타 작업 |
+| docs     | 문서 수정 (README 등)                |
+| test     | 테스트 코드 추가                     |
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+#### 예시
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+```bash
+feat: 로그인 폼 레이아웃 구현
+fix: 로그인 오류 메세지 출력 문제 해결
+chore: ESLint 설정 파일 추가
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+---
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## 브랜치 네이밍 규칙
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+#### 브랜치 type 예시
+
+| type     | 설명                       |
+| -------- | -------------------------- |
+| feat     | 기능 개발                  |
+| fix      | 버그 수정                  |
+| refactor | 코드 리팩토링              |
+| chore    | 설정, 빌드, 환경 관련 작업 |
+| docs     | 문서 작업                  |
+
+#### 예시
+
+- feat/home-ui-1
+- fix/login-error-7
+- chore/eslint-setup-3
+
+---
+
+## PR 작성 가이드
+
+- PR 제목: `[이슈번호] 작업 내용 요약`
+  - 예시: `[1] 홈 화면 UI 구현`
+- 본문: 자유 형식 작성 (작업 내용, 관련 이슈, 기타 사항 등 필요 시)
