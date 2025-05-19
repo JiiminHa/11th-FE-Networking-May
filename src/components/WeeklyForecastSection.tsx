@@ -32,7 +32,7 @@ const weeklyData: WeeklyForecast[] = [
 
 export default function WeeklyForecastSection() {
   return (
-    <section className="w-full max-w-[1328px] bg-white rounded-[16px] border-[2px] border-[#F2F2F2] shadow-[0_0_8px_2px_rgba(0,0,0,0.1)] p-6 flex flex-col gap-6">
+    <section className="w-full max-w-[1328px] bg-white rounded-[16px] border-[1px] border-[#F2F2F2] shadow-[0_0_8px_2px_rgba(0,0,0,0.1)] p-6 flex flex-col gap-6">
       <h3 className="text-[20px] font-bold">주간 예보</h3>
 
       <div className="overflow-x-auto px-[24px] py-3">
