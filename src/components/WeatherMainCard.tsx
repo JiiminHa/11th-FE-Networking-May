@@ -11,7 +11,7 @@ export default function WeatherMainCard() {
   const { temperature, location, date } = weatherMainCardData;
 
   return (
-    <section className="w-full max-w-[1328px] bg-white rounded-[16px] border-[2px] border-[#F2F2F2] shadow-[0_0_8px_2px_rgba(0,0,0,0.1)] p-8 flex flex-col gap-[12px]">
+    <section className="w-full max-w-[1328px] bg-white rounded-[16px] border-[1px] border-[#F2F2F2] shadow-[0_0_8px_2px_rgba(0,0,0,0.1)] p-8 flex flex-col gap-[12px]">
       <div>
         <h2 className="text-xl font-bold text-left">
           {date} {location} 날씨 현황
