@@ -12,6 +12,47 @@ const initialLocations: LocationItem[] = [
   { id: 7, name: "Osiu", isPinned: false },
 ];
 
+type ConfirmModalProps = {
+  title: string;
+  icon: string;
+  onCancel: () => void;
+  onConfirm: () => void;
+};
+
+const ConfirmModal = ({
+  title,
+  icon,
+  onCancel,
+  onConfirm,
+}: ConfirmModalProps) => {
+  return (
+    <div className="fixed inset-0 flex items-center justify-center bg-[#292E2E]/40 z-50">
+      <div className="flex flex-col items-center justify-center bg-white rounded-[16px] px-[108px] py-[36px] shadow-[4px_4px_4px_3px_rgba(0,0,0,0.25)] gap-[24px]">
+        <span className="text-[32px] font-bold text-[#292E2E] text-center">
+          {title}
+        </span>
+        {icon && (
+          <img src={icon} alt="삭제 아이콘" className="w-[160px] h-[160px]" />
+        )}
+        <div className="flex gap-[16px]">
+          <button
+            onClick={onCancel}
+            className="px-[24px] py-[6px] rounded-[6px] border-[1px] border-[#292E2E] text-[#292E2E] text-[20px] font-semibold"
+          >
+            취소하기
+          </button>
+          <button
+            onClick={onConfirm}
+            className="px-[24px] py-[6px] rounded-[6px] bg-[#292E2E] border-[1px] border-[#292E2E] text-white text-[20px] font-semibold"
+          >
+            삭제하기
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export default function Sidebar() {
   const [locations, setLocations] = useState<LocationItem[]>(initialLocations);
 
@@ -23,8 +64,17 @@ export default function Sidebar() {
     );
   };
 
+  const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
+
   const handleClickDelete = (id: number) => {
-    setLocations((prev) => prev.filter((item) => item.id !== id));
+    setDeleteTargetId(id); // 삭제하려는 id 기억 → 모달 띄움
+  };
+
+  const confirmDelete = () => {
+    if (deleteTargetId !== null) {
+      setLocations((prev) => prev.filter((item) => item.id !== deleteTargetId));
+      setDeleteTargetId(null); // 모달 닫기
+    }
   };
 
   // 고정된 위치가 위로 오도록 정렬
@@ -33,39 +83,51 @@ export default function Sidebar() {
   );
 
   return (
-    <aside className="w-[248px] rounded-tr-[48px] rounded-br-[48px] border-[1px] border-[#F2F2F2] shadow-[0_0_8px_2px_rgba(0,0,0,0.1)] shrink-0 px-[16px] py-[48px]">
-      <div className="flex flex-col gap-[40px]">
-        <div className="flex items-center gap-[16px]">
-          <img
-            src="/icons/map-pin-front-color.svg"
-            alt="지도 핀 아이콘"
-            className="w-[40px] h-[40px]"
-          />
-          <span className="text-[20px] font-bold text-[#292E2E]">
-            위치 목록
-          </span>
-        </div>
-
-        <div className="flex items-center gap-[16px]">
-          <img
-            src="/icons/plus-front-clay.svg"
-            alt="추가하기"
-            className="w-[40px] h-[40px]"
-          />
-          <span className="text-[20px] font-bold text-[#292E2E]">추가하기</span>
-        </div>
-
-        <div className="flex flex-col gap-[8px] px-[8px]">
-          {sortedLocations.map((item) => (
-            <LocationItemCard
-              key={item.id}
-              item={item}
-              onClickPin={handleClickPin}
-              onClickDelete={handleClickDelete}
+    <>
+      <aside className="w-[248px] rounded-tr-[48px] rounded-br-[48px] border-[1px] border-[#F2F2F2] shadow-[0_0_8px_2px_rgba(0,0,0,0.1)] shrink-0 px-[16px] py-[48px]">
+        <div className="flex flex-col gap-[40px]">
+          <div className="flex items-center gap-[16px]">
+            <img
+              src="/icons/map-pin-front-color.svg"
+              alt="지도 핀 아이콘"
+              className="w-[40px] h-[40px]"
             />
-          ))}
+            <span className="text-[20px] font-bold text-[#292E2E]">
+              위치 목록
+            </span>
+          </div>
+
+          <div className="flex items-center gap-[16px]">
+            <img
+              src="/icons/plus-front-clay.svg"
+              alt="추가하기"
+              className="w-[40px] h-[40px]"
+            />
+            <span className="text-[20px] font-bold text-[#292E2E]">
+              추가하기
+            </span>
+          </div>
+
+          <div className="flex flex-col gap-[8px] px-[8px]">
+            {sortedLocations.map((item) => (
+              <LocationItemCard
+                key={item.id}
+                item={item}
+                onClickPin={handleClickPin}
+                onClickDelete={handleClickDelete}
+              />
+            ))}
+          </div>
         </div>
-      </div>
-    </aside>
+      </aside>
+      {deleteTargetId !== null && (
+        <ConfirmModal
+          title="정말로 삭제하시겠습니까?"
+          icon="/icons/MoonThunder.png"
+          onCancel={() => setDeleteTargetId(null)}
+          onConfirm={confirmDelete}
+        />
+      )}
+    </>
   );
 }
