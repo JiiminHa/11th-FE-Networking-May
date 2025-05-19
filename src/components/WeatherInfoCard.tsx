@@ -1,22 +1,14 @@
-type Props = {
-  label: string;
-  value: string;
-  colorClass: string;
-  valueTextClass: string;
-};
+import type { WeatherInfo } from "../types/weather";
 
-export default function WeatherInfoCard({
-  label,
-  value,
-  colorClass,
-  valueTextClass,
-}: Props) {
+export default function WeatherInfoCard(props: WeatherInfo) {
+  const { label, value, colorClass, valueTextClass } = props;
+
   return (
     <div
       className={`flex flex-col items-center gap-[10px] w-[120px] px-[24px] py-[12px] rounded-[12px] ${colorClass}`}
     >
-      <p className="text-sm text-gray-500">{label}</p>
-      <p className={`text-base font-semibold ${valueTextClass}`}>{value}</p>
+      <p className="text-[12px] text-[#292E2E] font-medium">{label}</p>
+      <p className={`text-base font-bold ${valueTextClass}`}>{value}</p>
     </div>
   );
 }

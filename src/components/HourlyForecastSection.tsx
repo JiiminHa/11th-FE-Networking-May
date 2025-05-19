@@ -18,7 +18,7 @@ const hourlyData = [
 export default function HourlyForecastSection() {
   return (
     <section className="w-full max-w-[1328px] bg-white rounded-[16px] border-[2px] border-[#F2F2F2] shadow-[0_0_8px_2px_rgba(0,0,0,0.1)] p-6 flex flex-col gap-6">
-      <h3 className="text-base font-bold">시간별 현황</h3>
+      <h3 className="text-[20px] font-bold">시간별 현황</h3>
       <div className="flex flex-col gap-2 px-6 py-3">
         <div className="overflow-x-auto scrollbar-hide">
           <div className="relative flex gap-4 w-max">
