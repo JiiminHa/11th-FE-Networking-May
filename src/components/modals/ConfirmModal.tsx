@@ -18,7 +18,7 @@ export default function ConfirmModal({
 
   return (
     <ModalLayout onClose={onCancel}>
-      <div className="flex flex-col items-center justify-center bg-white rounded-[16px] px-[108px] py-[36px] shadow-[4px_4px_4px_3px_rgba(0,0,0,0.25)] gap-[24px] w-[480px]">
+      <div className="z-50 relative flex flex-col items-center justify-center bg-white rounded-[16px] px-[108px] py-[36px] shadow-[4px_4px_4px_3px_rgba(0,0,0,0.25)] gap-[24px] w-[480px]">
         <span className="text-[32px] font-bold text-[#292E2E] text-center">
           {title}
         </span>

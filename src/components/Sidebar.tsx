@@ -73,7 +73,7 @@ export default function Sidebar() {
           {/* 헤더 */}
           <div className="flex items-center gap-[16px]">
             <img
-              src="/icons/map-pin-front-color.svg"
+              src="../icons/map-pin-front-color.svg"
               alt="지도 핀 아이콘"
               className="w-[40px] h-[40px]"
             />
@@ -88,7 +88,7 @@ export default function Sidebar() {
             onClick={() => setIsAddModalOpen(true)}
           >
             <img
-              src="/icons/plus-front-clay.svg"
+              src="../icons/plus-front-clay.svg"
               alt="추가하기"
               className="w-[40px] h-[40px]"
             />
@@ -114,7 +114,7 @@ export default function Sidebar() {
       {/* 위치 추가 모달 */}
       {isAddModalOpen && (
         <AddLocationModal
-          icon="/icons/Clouds.png"
+          icon="../icons/Clouds.png"
           title="날씨 위치 추가"
           inputLabel="장소 이름"
           inputValue={newLocationName}
@@ -128,7 +128,7 @@ export default function Sidebar() {
       {deleteTargetId !== null && (
         <ConfirmModal
           title="정말로 삭제하시겠습니까?"
-          icon="/icons/MoonThunder.png"
+          icon="../icons/MoonThunder.png"
           onCancel={() => setDeleteTargetId(null)}
           onConfirm={confirmDelete}
         />
