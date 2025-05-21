@@ -1,6 +1,8 @@
 import { useState } from "react";
 import type { LocationItem } from "../types/location";
 import LocationItemCard from "./LocationItemCard";
+import AddLocationModal from "./AddLocationModal";
+import { useScrollLock } from "../hooks/useScrollLock";
 
 const initialLocations: LocationItem[] = [
   { id: 1, name: "강남역 1번출구", isPinned: true },
@@ -25,6 +27,7 @@ const ConfirmModal = ({
   onCancel,
   onConfirm,
 }: ConfirmModalProps) => {
+  useScrollLock();
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-[#292E2E]/40 z-50">
       <div className="flex flex-col items-center justify-center bg-white rounded-[16px] px-[108px] py-[36px] shadow-[4px_4px_4px_3px_rgba(0,0,0,0.25)] gap-[24px]">
@@ -55,6 +58,9 @@ const ConfirmModal = ({
 
 export default function Sidebar() {
   const [locations, setLocations] = useState<LocationItem[]>(initialLocations);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [newLocationName, setNewLocationName] = useState("");
+  const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
 
   const handleClickPin = (id: number) => {
     setLocations((prev) =>
@@ -64,20 +70,31 @@ export default function Sidebar() {
     );
   };
 
-  const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
-
   const handleClickDelete = (id: number) => {
-    setDeleteTargetId(id); // 삭제하려는 id 기억 → 모달 띄움
+    setDeleteTargetId(id);
   };
 
   const confirmDelete = () => {
     if (deleteTargetId !== null) {
       setLocations((prev) => prev.filter((item) => item.id !== deleteTargetId));
-      setDeleteTargetId(null); // 모달 닫기
+      setDeleteTargetId(null);
     }
   };
 
-  // 고정된 위치가 위로 오도록 정렬
+  const handleAddLocation = () => {
+    if (newLocationName.trim() === "") return;
+
+    const newLocation: LocationItem = {
+      id: Date.now(),
+      name: newLocationName.trim(),
+      isPinned: false,
+    };
+
+    setLocations((prev) => [...prev, newLocation]);
+    setNewLocationName("");
+    setIsAddModalOpen(false);
+  };
+
   const sortedLocations = [...locations].sort((a, b) =>
     a.isPinned === b.isPinned ? 0 : a.isPinned ? -1 : 1
   );
@@ -97,7 +114,10 @@ export default function Sidebar() {
             </span>
           </div>
 
-          <div className="flex items-center gap-[16px]">
+          <button
+            className="flex items-center gap-[16px]"
+            onClick={() => setIsAddModalOpen(true)}
+          >
             <img
               src="/icons/plus-front-clay.svg"
               alt="추가하기"
@@ -106,7 +126,7 @@ export default function Sidebar() {
             <span className="text-[20px] font-bold text-[#292E2E]">
               추가하기
             </span>
-          </div>
+          </button>
 
           <div className="flex flex-col gap-[8px] px-[8px]">
             {sortedLocations.map((item) => (
@@ -120,6 +140,19 @@ export default function Sidebar() {
           </div>
         </div>
       </aside>
+
+      {isAddModalOpen && (
+        <AddLocationModal
+          icon="/icons/Clouds.png"
+          title="날씨 위치 추가"
+          inputLabel="장소 이름"
+          inputValue={newLocationName}
+          setInputValue={setNewLocationName}
+          onClose={() => setIsAddModalOpen(false)}
+          onAdd={handleAddLocation}
+        />
+      )}
+
       {deleteTargetId !== null && (
         <ConfirmModal
           title="정말로 삭제하시겠습니까?"
