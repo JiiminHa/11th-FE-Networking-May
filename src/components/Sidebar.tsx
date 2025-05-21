@@ -1,9 +1,11 @@
+// 외부 import
 import { useState } from "react";
 import type { LocationItem } from "../types/location";
 import LocationItemCard from "./LocationItemCard";
-import AddLocationModal from "./AddLocationModal";
-import { useScrollLock } from "../hooks/useScrollLock";
+import AddLocationModal from "./modals/AddLocationModal";
+import ConfirmModal from "./modals/ConfirmModal";
 
+// 초기 위치 데이터
 const initialLocations: LocationItem[] = [
   { id: 1, name: "강남역 1번출구", isPinned: true },
   { id: 2, name: "RATTHAT", isPinned: false },
@@ -14,54 +16,14 @@ const initialLocations: LocationItem[] = [
   { id: 7, name: "Osiu", isPinned: false },
 ];
 
-type ConfirmModalProps = {
-  title: string;
-  icon: string;
-  onCancel: () => void;
-  onConfirm: () => void;
-};
-
-const ConfirmModal = ({
-  title,
-  icon,
-  onCancel,
-  onConfirm,
-}: ConfirmModalProps) => {
-  useScrollLock();
-  return (
-    <div className="fixed inset-0 flex items-center justify-center bg-[#292E2E]/40 z-50">
-      <div className="flex flex-col items-center justify-center bg-white rounded-[16px] px-[108px] py-[36px] shadow-[4px_4px_4px_3px_rgba(0,0,0,0.25)] gap-[24px]">
-        <span className="text-[32px] font-bold text-[#292E2E] text-center">
-          {title}
-        </span>
-        {icon && (
-          <img src={icon} alt="삭제 아이콘" className="w-[160px] h-[160px]" />
-        )}
-        <div className="flex gap-[16px]">
-          <button
-            onClick={onCancel}
-            className="px-[24px] py-[6px] rounded-[6px] border-[1px] border-[#292E2E] text-[#292E2E] text-[20px] font-semibold"
-          >
-            취소하기
-          </button>
-          <button
-            onClick={onConfirm}
-            className="px-[24px] py-[6px] rounded-[6px] bg-[#292E2E] border-[1px] border-[#292E2E] text-white text-[20px] font-semibold"
-          >
-            삭제하기
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
-
 export default function Sidebar() {
+  // 상태 정의
   const [locations, setLocations] = useState<LocationItem[]>(initialLocations);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [newLocationName, setNewLocationName] = useState("");
   const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
 
+  // 위치 고정 토글
   const handleClickPin = (id: number) => {
     setLocations((prev) =>
       prev.map((item) =>
@@ -70,10 +32,12 @@ export default function Sidebar() {
     );
   };
 
+  // 삭제 대상 설정
   const handleClickDelete = (id: number) => {
     setDeleteTargetId(id);
   };
 
+  // 삭제 확정 처리
   const confirmDelete = () => {
     if (deleteTargetId !== null) {
       setLocations((prev) => prev.filter((item) => item.id !== deleteTargetId));
@@ -81,6 +45,7 @@ export default function Sidebar() {
     }
   };
 
+  // 위치 추가 처리
   const handleAddLocation = () => {
     if (newLocationName.trim() === "") return;
 
@@ -95,14 +60,17 @@ export default function Sidebar() {
     setIsAddModalOpen(false);
   };
 
+  // 고정 여부 기준으로 정렬
   const sortedLocations = [...locations].sort((a, b) =>
     a.isPinned === b.isPinned ? 0 : a.isPinned ? -1 : 1
   );
 
   return (
     <>
+      {/* 위치 목록 사이드바 */}
       <aside className="w-[248px] rounded-tr-[48px] rounded-br-[48px] border-[1px] border-[#F2F2F2] shadow-[0_0_8px_2px_rgba(0,0,0,0.1)] shrink-0 px-[16px] py-[48px]">
         <div className="flex flex-col gap-[40px]">
+          {/* 헤더 */}
           <div className="flex items-center gap-[16px]">
             <img
               src="/icons/map-pin-front-color.svg"
@@ -114,6 +82,7 @@ export default function Sidebar() {
             </span>
           </div>
 
+          {/* 위치 추가 버튼 */}
           <button
             className="flex items-center gap-[16px]"
             onClick={() => setIsAddModalOpen(true)}
@@ -128,6 +97,7 @@ export default function Sidebar() {
             </span>
           </button>
 
+          {/* 위치 목록 리스트 */}
           <div className="flex flex-col gap-[8px] px-[8px]">
             {sortedLocations.map((item) => (
               <LocationItemCard
@@ -141,6 +111,7 @@ export default function Sidebar() {
         </div>
       </aside>
 
+      {/* 위치 추가 모달 */}
       {isAddModalOpen && (
         <AddLocationModal
           icon="/icons/Clouds.png"
@@ -153,6 +124,7 @@ export default function Sidebar() {
         />
       )}
 
+      {/* 삭제 확인 모달 */}
       {deleteTargetId !== null && (
         <ConfirmModal
           title="정말로 삭제하시겠습니까?"
