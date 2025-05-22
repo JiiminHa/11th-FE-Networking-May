@@ -25,7 +25,7 @@ export default function LocationItemCard({
       />
 
       <span className="text-[16px] font-semibold text-[#292E2E]">
-        {item.name}
+        {item.placeName}
       </span>
 
       <img

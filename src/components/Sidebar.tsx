@@ -82,14 +82,15 @@ export default function Sidebar() {
   // 위치 추가
   const handleAddLocation = async () => {
     if (!newLocationName.trim() || !latitude || !longitude) return;
-    try {
-      await api.post("/locations", {
-        placeName: newLocationName.trim(),
-        latitude: parseFloat(latitude),
-        longitude: parseFloat(longitude),
-        pinned: false,
-      });
 
+    const postData = {
+      placeName: newLocationName.trim(),
+      latitude: parseFloat(latitude),
+      longitude: parseFloat(longitude),
+      pinned: false,
+    };
+
+    try {
       alert("위치가 추가되었습니다!");
       setNewLocationName("");
       setLatitude("");
@@ -109,51 +110,53 @@ export default function Sidebar() {
 
   return (
     <>
-      {/* 임시 로그인 버튼 */}
-      <button
-        onClick={handleLogin}
-        className="bg-[#292E2E] text-white px-4 py-2 rounded-md text-sm"
-      >
-        임시 로그인
-      </button>
-      ;
       <aside className="w-[248px] rounded-tr-[48px] rounded-br-[48px] border-[1px] border-[#F2F2F2] shadow-[0_0_8px_2px_rgba(0,0,0,0.1)] shrink-0 px-[16px] py-[48px]">
-        <div className="flex flex-col gap-[40px]">
-          <div className="flex items-center gap-[16px]">
-            <img
-              src="../icons/map-pin-front-color.svg"
-              alt="지도 핀 아이콘"
-              className="w-[40px] h-[40px]"
-            />
-            <span className="text-[20px] font-bold text-[#292E2E]">
-              위치 목록
-            </span>
+        <div className="flex flex-col justify-between h-full">
+          <div className="flex flex-col gap-[40px]">
+            <div className="flex items-center gap-[16px]">
+              <img
+                src="../icons/map-pin-front-color.svg"
+                alt="지도 핀 아이콘"
+                className="w-[40px] h-[40px]"
+              />
+              <span className="text-[20px] font-bold text-[#292E2E]">
+                위치 목록
+              </span>
+            </div>
+
+            <button
+              className="flex items-center gap-[16px]"
+              onClick={() => setIsAddModalOpen(true)}
+            >
+              <img
+                src="../icons/plus-front-clay.svg"
+                alt="추가하기"
+                className="w-[40px] h-[40px]"
+              />
+              <span className="text-[20px] font-bold text-[#292E2E]">
+                추가하기
+              </span>
+            </button>
+
+            <div className="flex flex-col gap-[8px] px-[8px]">
+              {sortedLocations.map((item) => (
+                <LocationItemCard
+                  key={item.id}
+                  item={item}
+                  placeName={item.placeName}
+                  onClickPin={handleClickPin}
+                  onClickDelete={handleClickDelete}
+                />
+              ))}
+            </div>
           </div>
 
           <button
-            className="flex items-center gap-[16px]"
-            onClick={() => setIsAddModalOpen(true)}
+            onClick={handleLogin}
+            className="mt-[40px] bg-[#292E2E] text-white px-4 py-2 rounded-md text-sm"
           >
-            <img
-              src="../icons/plus-front-clay.svg"
-              alt="추가하기"
-              className="w-[40px] h-[40px]"
-            />
-            <span className="text-[20px] font-bold text-[#292E2E]">
-              추가하기
-            </span>
+            임시 로그인
           </button>
-
-          <div className="flex flex-col gap-[8px] px-[8px]">
-            {sortedLocations.map((item) => (
-              <LocationItemCard
-                key={item.id}
-                item={item}
-                onClickPin={handleClickPin}
-                onClickDelete={handleClickDelete}
-              />
-            ))}
-          </div>
         </div>
       </aside>
       {isAddModalOpen && (
