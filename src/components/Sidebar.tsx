@@ -1,27 +1,57 @@
 // 외부 import
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { LocationItem } from "../types/location";
 import LocationItemCard from "./LocationItemCard";
 import AddLocationModal from "./modals/AddLocationModal";
 import ConfirmModal from "./modals/ConfirmModal";
-
-// 초기 위치 데이터
-const initialLocations: LocationItem[] = [
-  { id: 1, name: "강남역 1번출구", isPinned: true },
-  { id: 2, name: "RATTHAT", isPinned: false },
-  { id: 3, name: "파이홀", isPinned: false },
-  { id: 4, name: "청수당공명", isPinned: false },
-  { id: 5, name: "롯데월드", isPinned: false },
-  { id: 6, name: "구관", isPinned: false },
-  { id: 7, name: "Osiu", isPinned: false },
-];
+import api from "../../src/api/axios";
+import axios from "axios";
 
 export default function Sidebar() {
-  // 상태 정의
-  const [locations, setLocations] = useState<LocationItem[]>(initialLocations);
+  const [locations, setLocations] = useState<LocationItem[]>([]);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [newLocationName, setNewLocationName] = useState("");
+  const [latitude, setLatitude] = useState("");
+  const [longitude, setLongitude] = useState("");
   const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
+
+  const handleLogin = async () => {
+    try {
+      const res = await api.post("/users/login", {
+        email: "testuser2@example.com",
+        password: "Test1234!",
+      });
+      console.log("로그인 성공 응답:", res);
+      alert("로그인 성공!");
+      fetchLocations();
+    } catch (err) {
+      console.error("로그인 실패:", err);
+      alert("로그인 실패");
+    }
+  };
+
+  // 위치 목록을 가져오는 함수
+  const fetchLocations = async () => {
+    try {
+      const res = await api.get("/locations");
+      setLocations(res.data.results);
+    } catch (err) {
+      // 타입 좁히기: err가 AxiosError인지 확인
+      if (axios.isAxiosError(err)) {
+        if (err.response?.status !== 401) {
+          console.error("목록 조회 실패", err);
+          alert("위치 목록을 불러오는 데 실패했습니다.");
+        }
+      } else {
+        console.error("예상치 못한 에러", err);
+      }
+    }
+  };
+
+  // 컴포넌트가 마운트될 때 위치 목록을 가져옴
+  useEffect(() => {
+    fetchLocations();
+  }, []);
 
   // 위치 고정 토글
   const handleClickPin = (id: number) => {
@@ -32,45 +62,63 @@ export default function Sidebar() {
     );
   };
 
-  // 삭제 대상 설정
   const handleClickDelete = (id: number) => {
     setDeleteTargetId(id);
   };
 
-  // 삭제 확정 처리
-  const confirmDelete = () => {
-    if (deleteTargetId !== null) {
-      setLocations((prev) => prev.filter((item) => item.id !== deleteTargetId));
+  // 삭제 확인 후 API 호출
+  const confirmDelete = async () => {
+    if (deleteTargetId === null) return;
+    try {
+      await api.delete(`/locations/${deleteTargetId}`);
       setDeleteTargetId(null);
+      fetchLocations();
+    } catch (error) {
+      console.error("삭제 실패:", error);
+      alert("삭제에 실패했습니다. 다시 시도해주세요");
     }
   };
 
-  // 위치 추가 처리
-  const handleAddLocation = () => {
-    if (newLocationName.trim() === "") return;
+  // 위치 추가
+  const handleAddLocation = async () => {
+    if (!newLocationName.trim() || !latitude || !longitude) return;
+    try {
+      await api.post("/locations", {
+        placeName: newLocationName.trim(),
+        latitude: parseFloat(latitude),
+        longitude: parseFloat(longitude),
+        pinned: false,
+      });
 
-    const newLocation: LocationItem = {
-      id: Date.now(),
-      name: newLocationName.trim(),
-      isPinned: false,
-    };
-
-    setLocations((prev) => [...prev, newLocation]);
-    setNewLocationName("");
-    setIsAddModalOpen(false);
+      alert("위치가 추가되었습니다!");
+      setNewLocationName("");
+      setLatitude("");
+      setLongitude("");
+      setIsAddModalOpen(false);
+      fetchLocations();
+    } catch (error) {
+      console.error("위치 추가 실패:", error);
+      alert("위치 추가에 실패했습니다. 다시 시도해주세요.");
+    }
   };
 
-  // 고정 여부 기준으로 정렬
+  // 위치 목록을 고정된 순서로 정렬
   const sortedLocations = [...locations].sort((a, b) =>
     a.isPinned === b.isPinned ? 0 : a.isPinned ? -1 : 1
   );
 
   return (
     <>
-      {/* 위치 목록 사이드바 */}
+      {/* 임시 로그인 버튼 */}
+      <button
+        onClick={handleLogin}
+        className="bg-[#292E2E] text-white px-4 py-2 rounded-md text-sm"
+      >
+        임시 로그인
+      </button>
+      ;
       <aside className="w-[248px] rounded-tr-[48px] rounded-br-[48px] border-[1px] border-[#F2F2F2] shadow-[0_0_8px_2px_rgba(0,0,0,0.1)] shrink-0 px-[16px] py-[48px]">
         <div className="flex flex-col gap-[40px]">
-          {/* 헤더 */}
           <div className="flex items-center gap-[16px]">
             <img
               src="../icons/map-pin-front-color.svg"
@@ -82,7 +130,6 @@ export default function Sidebar() {
             </span>
           </div>
 
-          {/* 위치 추가 버튼 */}
           <button
             className="flex items-center gap-[16px]"
             onClick={() => setIsAddModalOpen(true)}
@@ -97,7 +144,6 @@ export default function Sidebar() {
             </span>
           </button>
 
-          {/* 위치 목록 리스트 */}
           <div className="flex flex-col gap-[8px] px-[8px]">
             {sortedLocations.map((item) => (
               <LocationItemCard
@@ -110,8 +156,6 @@ export default function Sidebar() {
           </div>
         </div>
       </aside>
-
-      {/* 위치 추가 모달 */}
       {isAddModalOpen && (
         <AddLocationModal
           icon="../icons/Clouds.png"
@@ -119,12 +163,14 @@ export default function Sidebar() {
           inputLabel="장소 이름"
           inputValue={newLocationName}
           setInputValue={setNewLocationName}
+          latitude={latitude}
+          setLatitude={setLatitude}
+          longitude={longitude}
+          setLongitude={setLongitude}
           onClose={() => setIsAddModalOpen(false)}
           onAdd={handleAddLocation}
         />
       )}
-
-      {/* 삭제 확인 모달 */}
       {deleteTargetId !== null && (
         <ConfirmModal
           title="정말로 삭제하시겠습니까?"

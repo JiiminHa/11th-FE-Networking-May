@@ -1,12 +1,13 @@
 // src/api/axios.ts
+
 import axios from "axios";
 
-const instance = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL,
+const api = axios.create({
+  baseURL: "/api/v1", // 기존의 http://54.180... 대신 "/api"부터 시작
   headers: {
     "Content-Type": "application/json",
   },
   withCredentials: true,
 });
 
-export default instance;
+export default api;

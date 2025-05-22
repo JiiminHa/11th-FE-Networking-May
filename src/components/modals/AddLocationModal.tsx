@@ -1,18 +1,19 @@
+// AddLocationModal.tsx
 import ModalLayout from "./Modal";
-import { useState } from "react";
 import { useScrollLock } from "../../hooks/useScrollLock";
+import { useEffect } from "react";
 
-type LocationResult = {
-  name: string;
-  address: string;
-};
-
+// props 타입 정의
 type AddLocationModalProps = {
   icon: string;
   title: string;
   inputLabel: string;
   inputValue: string;
   setInputValue: (val: string) => void;
+  latitude: string;
+  setLatitude: (val: string) => void;
+  longitude: string;
+  setLongitude: (val: string) => void;
   onClose: () => void;
   onAdd: () => void;
 };
@@ -20,106 +21,113 @@ type AddLocationModalProps = {
 export default function AddLocationModal({
   icon,
   title,
-  inputLabel,
   inputValue,
   setInputValue,
+  latitude,
+  setLatitude,
+  longitude,
+  setLongitude,
   onClose,
   onAdd,
 }: AddLocationModalProps) {
-  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   useScrollLock();
-  // Dummy 검색 결과 - 나중에 API로 교체
-  const locationResults: LocationResult[] = [
-    { name: "KFC 광화문점", address: "서울 종로구 세종로 161-1" },
-    { name: "KFC 부산서면점", address: "부산 부산진구 부전동 241-17" },
-    { name: "KFC 홍익대점", address: "서울 마포구 동교동 165-8" },
-  ];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (
+        window.kakao &&
+        window.kakao.maps &&
+        window.kakao.maps.services &&
+        window.kakao.maps.services.Places
+      ) {
+        console.log("✅ Kakao Maps SDK 로딩 완료");
+        clearInterval(interval);
+      } else {
+        console.log("⏳ Kakao Maps SDK 로딩 중...");
+      }
+    }, 500);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleSearch = () => {
+    if (
+      !window.kakao ||
+      !window.kakao.maps ||
+      !window.kakao.maps.services ||
+      !window.kakao.maps.services.Places
+    ) {
+      alert("카카오맵 로딩 실패");
+      return;
+    }
+
+    // handleSearch
+    const ps = new window.kakao.maps.services.Places();
+    ps.keywordSearch(inputValue, (data, status) => {
+      if (status === window.kakao.maps.services.Status.OK) {
+        const result = data[0];
+        setLatitude(result.y);
+        setLongitude(result.x);
+      } else {
+        alert("장소 검색 실패");
+      }
+    });
+  };
 
   return (
     <ModalLayout onClose={onClose}>
-      <div className="fixed inset-0 flex items-center justify-center z-50">
-        <div className="fixed inset-0 bg-[#292E2E]/40" onClick={onClose} />
+      <div className="z-50 relative flex flex-col items-start bg-white rounded-[16px] px-[72px] py-[36px] shadow-[4px_4px_4px_3px_rgba(0,0,0,0.25)] gap-[24px] w-[480px]">
+        <img
+          src="/icons/multiply.svg"
+          alt="닫기"
+          className="absolute top-4 right-4 w-[24px] h-[24px] cursor-pointer"
+          onClick={onClose}
+        />
 
-        <div className="z-50 relative flex flex-col items-start bg-white rounded-[16px] px-[72px] py-[36px] shadow-[4px_4px_4px_3px_rgba(0,0,0,0.25)] gap-[24px] w-[480px]">
+        <div className="flex items-center gap-4 w-full">
           <img
-            src="/icons/multiply.svg"
-            alt="닫기"
-            className="absolute top-4 right-4 w-[24px] h-[24px] cursor-pointer"
-            onClick={onClose}
+            src={icon}
+            alt="아이콘"
+            className="w-[80px] h-[80px] self-center"
+          />
+          <h2 className="text-[32px] font-bold text-[#292E2E] leading-tight">
+            {title}
+          </h2>
+        </div>
+
+        <div className="relative w-full">
+          <input
+            type="text"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            className="border-b-[1px] border-[#292E2E] px-[8px] py-[4px] w-full"
+            placeholder="장소를 입력하세요"
           />
 
-          {/* 상단 아이콘 + 제목 */}
-          <div className="flex items-center gap-4 w-full">
+          <button
+            type="button"
+            onClick={handleSearch}
+            className="absolute top-1/2 right-4 transform -translate-y-1/2"
+          >
             <img
-              src={icon}
-              alt="아이콘"
-              className="w-[80px] h-[80px] self-center"
+              src="/icons/zoom-front-color.svg"
+              alt="검색"
+              className="w-5 h-5"
             />
-            <h2 className="text-[32px] font-bold text-[#292E2E] leading-tight">
-              {title}
-            </h2>
-          </div>
+          </button>
+        </div>
 
-          {/* 입력 라벨 + 검색창 */}
-          <div className="w-full text-left gap-[8px] flex flex-col">
-            <label className="text-[24px] font-semibold text-[#292E2E] block">
-              {inputLabel}
-            </label>
+        <div className="text-sm text-gray-500 mt-2">
+          위도: {latitude} / 경도: {longitude}
+        </div>
 
-            <div className="relative w-full">
-              <input
-                type="text"
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                className="border-b-[1px] border-[#292E2E]  px-[8px] py-[4px] w-full"
-                placeholder="장소를 입력하세요"
-              />
-              <img
-                src="/icons/zoom-front-color.svg"
-                alt="검색"
-                className="absolute top-1/2 right-4 transform -translate-y-1/2 w-5 h-5"
-              />
-            </div>
-          </div>
-
-          {/* 검색 결과 리스트 */}
-          <ul className="w-full flex flex-col gap-[16px] border border-[#A4A4A4] rounded-[8px] px-[16px] py-[8px] overflow-hidden">
-            {locationResults.map((loc, idx) => (
-              <li
-                key={idx}
-                onClick={() => {
-                  setSelectedIndex(idx);
-                  setInputValue(loc.name);
-                }}
-                className={`relative cursor-pointer`}
-              >
-                <div className="border-b border-[#A4A4A4] px-[12px] py-[8px] flex flex-col gap-[4px]">
-                  <div className="text-base font-semibold text-[#292E2E]">
-                    {loc.name}
-                  </div>
-                  <div className="text-sm text-[#A4A4A4]">{loc.address}</div>
-                </div>
-
-                {selectedIndex === idx && (
-                  <img
-                    src="/icons/tick-front-color.svg"
-                    alt="선택됨"
-                    className="absolute top-[12px] right-[12px] w-[36px] h-[36px]"
-                  />
-                )}
-              </li>
-            ))}
-          </ul>
-
-          {/* 확인 버튼 */}
-          <div className="w-full flex justify-end mt-2">
-            <button
-              onClick={onAdd}
-              className="bg-[#292E2E] text-white px-6 py-2 rounded-[6px] text-[16px] font-semibold"
-            >
-              확인
-            </button>
-          </div>
+        <div className="w-full flex justify-end mt-2">
+          <button
+            onClick={onAdd}
+            className="bg-[#292E2E] text-white px-6 py-2 rounded-[6px] text-[16px] font-semibold"
+          >
+            확인
+          </button>
         </div>
       </div>
     </ModalLayout>
