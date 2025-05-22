@@ -1,5 +1,5 @@
 export type LocationItem = {
   id: number;
-  name: string;
+  placeName: string;
   isPinned: boolean;
 };

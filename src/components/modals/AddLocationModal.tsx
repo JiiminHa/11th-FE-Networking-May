@@ -1,7 +1,6 @@
-// AddLocationModal.tsx
 import ModalLayout from "./Modal";
 import { useScrollLock } from "../../hooks/useScrollLock";
-import { useEffect } from "react";
+import { useKakaoLoader } from "../../hooks/useKakaoLoader";
 
 // props 타입 정의
 type AddLocationModalProps = {
@@ -21,6 +20,7 @@ type AddLocationModalProps = {
 export default function AddLocationModal({
   icon,
   title,
+
   inputValue,
   setInputValue,
   latitude,
@@ -31,24 +31,7 @@ export default function AddLocationModal({
   onAdd,
 }: AddLocationModalProps) {
   useScrollLock();
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (
-        window.kakao &&
-        window.kakao.maps &&
-        window.kakao.maps.services &&
-        window.kakao.maps.services.Places
-      ) {
-        console.log("✅ Kakao Maps SDK 로딩 완료");
-        clearInterval(interval);
-      } else {
-        console.log("⏳ Kakao Maps SDK 로딩 중...");
-      }
-    }, 500);
-
-    return () => clearInterval(interval);
-  }, []);
+  useKakaoLoader();
 
   const handleSearch = () => {
     if (
@@ -61,7 +44,6 @@ export default function AddLocationModal({
       return;
     }
 
-    // handleSearch
     const ps = new window.kakao.maps.services.Places();
     ps.keywordSearch(inputValue, (data, status) => {
       if (status === window.kakao.maps.services.Status.OK) {
@@ -103,7 +85,6 @@ export default function AddLocationModal({
             className="border-b-[1px] border-[#292E2E] px-[8px] py-[4px] w-full"
             placeholder="장소를 입력하세요"
           />
-
           <button
             type="button"
             onClick={handleSearch}
