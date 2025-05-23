@@ -1,4 +1,3 @@
-// App.tsx
 import { useState } from "react";
 import Sidebar from "./components/Sidebar";
 import WeatherMainCard from "./components/WeatherMainCard";
@@ -7,7 +6,7 @@ import WeeklyForecastSection from "./components/WeeklyForecastSection";
 import NoLocationSelected from "./components/NoLocationSelected";
 import type { LocationItem } from "./types/location";
 
-function App() {
+export default function App() {
   const [selectedLocation, setSelectedLocation] = useState<LocationItem | null>(
     null
   );
@@ -30,5 +29,3 @@ function App() {
     </div>
   );
 }
-
-export default App;
