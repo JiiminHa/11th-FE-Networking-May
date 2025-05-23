@@ -7,7 +7,11 @@ import ConfirmModal from "./modals/ConfirmModal";
 import api from "../../src/api/axios";
 import axios from "axios";
 
-export default function Sidebar() {
+export default function Sidebar({
+  onSelectLocation,
+}: {
+  onSelectLocation: (loc: LocationItem | null) => void;
+}) {
   const [locations, setLocations] = useState<LocationItem[]>([]);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [newLocationName, setNewLocationName] = useState("");
@@ -34,7 +38,12 @@ export default function Sidebar() {
   const fetchLocations = async () => {
     try {
       const res = await api.get("/locations");
-      setLocations(res.data.results);
+      const fetched = res.data.results;
+      setLocations(fetched);
+
+      if (fetched.length === 0) {
+        onSelectLocation(null);
+      }
     } catch (err) {
       // 타입 좁히기: err가 AxiosError인지 확인
       if (axios.isAxiosError(err)) {
@@ -72,7 +81,7 @@ export default function Sidebar() {
     try {
       await api.delete(`/locations/${deleteTargetId}`);
       setDeleteTargetId(null);
-      fetchLocations();
+      await fetchLocations();
     } catch (error) {
       console.error("삭제 실패:", error);
       alert("삭제에 실패했습니다. 다시 시도해주세요");
@@ -82,7 +91,6 @@ export default function Sidebar() {
   // 위치 추가
   const handleAddLocation = async () => {
     if (!newLocationName.trim() || !latitude || !longitude) return;
-
     const postData = {
       placeName: newLocationName.trim(),
       latitude: parseFloat(latitude),
@@ -91,12 +99,16 @@ export default function Sidebar() {
     };
 
     try {
+      await api.post("/locations", postData);
       alert("위치가 추가되었습니다!");
       setNewLocationName("");
       setLatitude("");
       setLongitude("");
       setIsAddModalOpen(false);
-      fetchLocations();
+      const res = await api.get("/locations");
+      const updated = res.data.results;
+      setLocations(updated);
+      onSelectLocation(updated[updated.length - 1]);
     } catch (error) {
       console.error("위치 추가 실패:", error);
       alert("위치 추가에 실패했습니다. 다시 시도해주세요.");
@@ -143,9 +155,9 @@ export default function Sidebar() {
                 <LocationItemCard
                   key={item.id}
                   item={item}
-                  placeName={item.placeName}
                   onClickPin={handleClickPin}
                   onClickDelete={handleClickDelete}
+                  onClick={() => onSelectLocation(item)}
                 />
               ))}
             </div>
@@ -159,9 +171,10 @@ export default function Sidebar() {
           </button>
         </div>
       </aside>
+
       {isAddModalOpen && (
         <AddLocationModal
-          icon="../icons/Clouds.png"
+          icon="../icons/Clouds.svg"
           title="날씨 위치 추가"
           inputLabel="장소 이름"
           inputValue={newLocationName}
@@ -174,10 +187,11 @@ export default function Sidebar() {
           onAdd={handleAddLocation}
         />
       )}
+
       {deleteTargetId !== null && (
         <ConfirmModal
           title="정말로 삭제하시겠습니까?"
-          icon="../icons/MoonThunder.png"
+          icon="../icons/MoonThunder.svg"
           onCancel={() => setDeleteTargetId(null)}
           onConfirm={confirmDelete}
         />

@@ -12,8 +12,8 @@ export type WeatherMainCard = {
 };
 
 export type HourlyForecast = {
-  time: string;
-  icon: string;
+  hour: string;
+  condition: string;
   temperature: string;
 };
 
